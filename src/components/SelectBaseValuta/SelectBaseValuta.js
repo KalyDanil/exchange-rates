@@ -7,7 +7,7 @@ const SelectBaseValuta = (props) => {
 
   return (
     <Select value={props.baseValuta} onChange={(e) => props.selectBaseValuta(e)}>
-      <MenuItem  key={'RUB'} value={'RUB'} >RUB</MenuItem >
+      <MenuItem value={'RUB'} >RUB</MenuItem >
       {Object.keys(exchangeRate.data).map((valuta) => 
         <MenuItem  key={valuta} value={valuta} >{valuta}</MenuItem >
       )}

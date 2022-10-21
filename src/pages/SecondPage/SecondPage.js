@@ -1,16 +1,16 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { SecondPageStyle } from './SecondPage.style';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { getExchangeRateReq } from '../../api';
 import ValutaExchangeRate from '../../components/ValutaExchangeRate/ValutaExchangeRate';
-import { getExchangeRateAction } from '../../store/slice';
+import { getBaseValutaAction, getExchangeRateAction } from '../../store/slice';
 import SelectBaseValuta from '../../components/SelectBaseValuta/SelectBaseValuta';
 import { Button, Table, TableBody } from '@material-ui/core';
 
 const SecondPage = () => {
   const exchangeRate = useSelector((state) => state.exchangeRate);
   const dispatch = useDispatch();
-  const [baseValuta, setBaseValuta] = useState('RUB');
+  const baseValuta = exchangeRate.baseValuta;
   const options = {year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', };
   const updateDate = new Date(exchangeRate.updateDate).toLocaleDateString([], options);
 
@@ -22,10 +22,10 @@ const SecondPage = () => {
     getResponse();
     switch(window.navigator.language) {
       case 'ru-RU':
-        setBaseValuta('RUB');
+        dispatch(getBaseValutaAction('RUB'));
         break;
       case 'en-US': 
-        setBaseValuta('USD');
+        dispatch(getBaseValutaAction('USD'));
         break;
       default:
         break;
@@ -33,13 +33,13 @@ const SecondPage = () => {
   }, [dispatch]);
 
   const selectBaseValuta = (e) => {
-    setBaseValuta(e.target.value);
+    dispatch(getBaseValutaAction(e.target.value));
   };
 
   const toExchanger =() => {
     window.location.href = '/exchanger';
   };
-
+ 
   const exchangeRateList = Object.keys(exchangeRate.data).map((valuta) => 
     <ValutaExchangeRate
       key={valuta}
@@ -49,6 +49,10 @@ const SecondPage = () => {
       baseValutaRate={baseValuta === 'RUB' ? null : exchangeRate.data[baseValuta].Value}
     />
   );
+
+  if (!baseValuta) {
+    return <div></div>
+  }
 
   return (
     <SecondPageStyle>
@@ -66,7 +70,7 @@ const SecondPage = () => {
           && <ValutaExchangeRate
                 valuta={'RUB'}
                 baseValuta={baseValuta}
-                rate={+(1 / exchangeRate.data[baseValuta].Value).toFixed(4)}
+                rate={exchangeRate.data[baseValuta] ? +(1 / exchangeRate.data[baseValuta].Value).toFixed(4) : 0}
                 baseValutaRate={null}
               />
           }
