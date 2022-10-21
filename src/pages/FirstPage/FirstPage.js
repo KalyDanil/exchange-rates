@@ -1,9 +1,10 @@
 import { FirstPageStyle } from './FirstPage.style';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from 'react';
-import { conversionAction, getExchangeRateAction } from '../../store/reducer/thunks';
 import { getExchangeRateReq } from '../../api';
+import { conversionAction, getExchangeRateAction } from '../../store/slice';
 import { toast } from 'react-toastify';
+import { Button, FormControl, Input, TextField } from '@material-ui/core';
 
 const FirstPage = () => {
   const exchangeRate = useSelector((state) => state.exchangeRate);
@@ -52,20 +53,9 @@ const FirstPage = () => {
         const result = (exchangeSum * rate).toFixed(4);
         dispatch(conversionAction(result));
       }
-
-      // if (secondValuta === 'RUB') {
-      //   const result = exchangeSum * 1;
-      //   dispatch(conversionAction(result));
-      //   setConversion('');
-      //   return;
-      // }
-
-      // const rate = exchangeRate.data[secondValuta].Value;
-      // const result = exchangeSum * rate;
-      // dispatch(conversionAction(result));
-      // setConversion('');
     } catch (err) {
-      toast("Wrong format. Сorrect format example: 100 rub in usd")
+      dispatch(conversionAction(''));
+      toast("Wrong format. Сorrect format example: 100 rub in usd");
     }
   };
 
@@ -75,17 +65,14 @@ const FirstPage = () => {
 
   return (
     <FirstPageStyle>
-      <button onClick={toExchangerate}>Exchange rate</button>
-      <form onSubmit={(e) => convert(e)}>
-        <span>Enter conversion</span>
-        <input value={conversion} onInput={(e) => conversionInput(e.target.value)}/>
-        {exchangeRate.conversionResult ? 
-          <span>Result: {exchangeRate.conversionResult}</span>
-          :
-          <></>
-        }
-        <input type="submit" value="Convert" />
-      </form>
+      <Button className="navigationButton" variant="contained" onClick={toExchangerate}>Exchange rate</Button>
+      <FormControl onSubmit={(e) => convert(e)}>
+        <form>
+          <TextField label="Enter conversion" value={conversion} onInput={(e) => conversionInput(e.target.value)}/>
+          <Input className="formInputSubmit" type="submit" variant="contained"  value="Convert" />
+        </form>
+        {exchangeRate.conversionResult && <p >Result: {exchangeRate.conversionResult}</p >}
+      </FormControl>
     </FirstPageStyle>
   );
 };

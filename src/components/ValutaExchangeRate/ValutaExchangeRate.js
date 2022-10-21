@@ -1,18 +1,16 @@
 import PropTypes from 'prop-types'
-import { ValutaExchangeRateStyle } from './ValutaExchangeRate.style';
 import nullable from 'prop-types-nullable';
+import { TableCell, TableRow } from '@material-ui/core';
 
 const ValutaExchangeRate = (props) => {
   return (
-    <ValutaExchangeRateStyle>
+    <TableRow>
       {
-        props.baseValuta === "RUB" ? 
-        <span>1 {props.valuta} = {props.rate} {props.baseValuta}</span>
-        :
-        <span>1 {props.valuta} = {(props.rate / props.baseValutaRate).toFixed(4)} {props.baseValuta}</span>
+        props.baseValutaRate === null
+        ? <TableCell>1 {props.valuta} = {props.rate} {props.baseValuta}</TableCell>
+        : props.baseValuta !== props.valuta && <TableCell> 1 {props.valuta} = {(props.rate / props.baseValutaRate).toFixed(4)} {props.baseValuta}</TableCell>
       }
-      
-    </ValutaExchangeRateStyle>
+    </TableRow>
   );
 };
 

@@ -9,7 +9,7 @@ api.interceptors.response.use(
   },
 );
 
-export const getExchangeRateReq = async (body) => {
+export const getExchangeRateReq = async () => {
   try {
     const res = await api.get('https://www.cbr-xml-daily.ru/daily_json.js');
     return res;

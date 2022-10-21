@@ -2,16 +2,17 @@ import { useSelector, useDispatch } from 'react-redux';
 import { SecondPageStyle } from './SecondPage.style';
 import { useEffect, useState } from 'react';
 import { getExchangeRateReq } from '../../api';
-import { getExchangeRateAction } from '../../store/reducer/thunks';
 import ValutaExchangeRate from '../../components/ValutaExchangeRate/ValutaExchangeRate';
+import { getExchangeRateAction } from '../../store/slice';
+import SelectBaseValuta from '../../components/SelectBaseValuta/SelectBaseValuta';
+import { Button, Table, TableBody } from '@material-ui/core';
 
 const SecondPage = () => {
   const exchangeRate = useSelector((state) => state.exchangeRate);
   const dispatch = useDispatch();
-  const [baseValuta, setBaseValuta] = useState('');
+  const [baseValuta, setBaseValuta] = useState('RUB');
   const options = {year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', };
   const updateDate = new Date(exchangeRate.updateDate).toLocaleDateString([], options);
-  const baseValutaArr = ['RUB', 'AUD', 'AZN', 'GBP', 'AMD', 'BYN', 'BGN', 'BRL', 'HUF', 'HKD', 'DKK', 'USD', 'EUR', 'INR', 'KZT', 'CAD', 'KGS', 'CNY', 'MDL', 'NOK', 'PLN', 'RON', 'XDR', 'SGD', 'TJS', 'TRY', 'TMT', 'UZS', 'UAH', 'CZK', 'SEK', 'CHF', 'ZAR', 'KRW', 'JPY']
 
   useEffect(() => {
     const getResponse = async () => {
@@ -38,36 +39,40 @@ const SecondPage = () => {
   const toExchanger =() => {
     window.location.href = '/exchanger';
   };
- 
-  const a = Object.keys(exchangeRate.data).map((valuta) => ValutaExchangeRate(
-    {
-      valuta,
-      baseValuta,
-      rate: exchangeRate.data[valuta].Value,
-      baseValutaRate: baseValuta === 'RUB' ? null : exchangeRate.data[baseValuta].Value,
-    }
-  ));
 
-  const b = baseValutaArr.map((valuta) => {
-    return (
-      <>
-        {
-          baseValuta === valuta ? 
-          <option value={valuta} selected>{valuta}</option>
-          :
-          <option value={valuta}>{valuta}</option>
-        }
-      </>
-    )
-  })
+  const exchangeRateList = Object.keys(exchangeRate.data).map((valuta) => 
+    <ValutaExchangeRate
+      key={valuta}
+      valuta={valuta}
+      baseValuta={baseValuta}
+      rate={exchangeRate.data[valuta].Value}
+      baseValutaRate={baseValuta === 'RUB' ? null : exchangeRate.data[baseValuta].Value}
+    />
+  );
+
   return (
     <SecondPageStyle>
-      <button onClick={toExchanger}>Exchanger</button>
-      <span>Base valuta</span><select name="select" onChange={(e) => selectBaseValuta(e)}>
-        {b}
-      </select>
-      <span>Last update date</span>{updateDate}
-      {a}
+      <div className="topLineDiv">
+        <span>Last exchange rate update date: {updateDate}</span>
+        <Button variant="contained" onClick={toExchanger}>Exchanger</Button>
+      </div>
+      <div className="baseValutaDiv">
+        <span>Base valuta: </span>
+        <SelectBaseValuta baseValuta={baseValuta} selectBaseValuta={selectBaseValuta} />
+      </div>
+      <Table className="exchangeRateTable">
+        <TableBody>
+          {baseValuta !== 'RUB' 
+          && <ValutaExchangeRate
+                valuta={'RUB'}
+                baseValuta={baseValuta}
+                rate={+(1 / exchangeRate.data[baseValuta].Value).toFixed(4)}
+                baseValutaRate={null}
+              />
+          }
+          {exchangeRateList}
+        </TableBody>
+      </Table>
     </SecondPageStyle>
   );
 };
