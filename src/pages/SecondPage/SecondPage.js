@@ -21,9 +21,11 @@ const SecondPage = () => {
     };
     getResponse();
     switch(window.navigator.language) {
+      case 'ru':
       case 'ru-RU':
         dispatch(getBaseValutaAction('RUB'));
         break;
+      case 'en':
       case 'en-US': 
         dispatch(getBaseValutaAction('USD'));
         break;
